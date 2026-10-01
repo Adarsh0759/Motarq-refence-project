@@ -1,0 +1,12 @@
+{"oem":"D","fields":{
+ "vin":{"path":"v"},
+ "ts":{"path":"t","format":"epoch_s"},
+ "lat":{"path":"la"},"lon":{"path":"lo"},
+ "speed_kmh":{"path":"spd_mph","unit":"mph"},
+ "odo_km":{"path":"odo_mi","unit":"mi"},
+ "fuel_pct":{"path":"fl"},
+ "engine_on":{"path":"eng","truthy":[true]},
+ "rpm":{"path":"r"},
+ "dtc":{"path":"d"},
+ "evt":{"path":"e"},
+ "seq":{"path":"s"}}}

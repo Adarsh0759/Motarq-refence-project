@@ -1,0 +1,12 @@
+{"oem":"A","fields":{
+ "vin":{"path":"vehicleId"},
+ "ts":{"path":"timestamp","format":"epoch_ms"},
+ "lat":{"path":"position.latitude"},"lon":{"path":"position.longitude"},
+ "speed_kmh":{"path":"velocityMph","unit":"mph"},
+ "odo_km":{"path":"odometerMiles","unit":"mi"},
+ "fuel_pct":{"path":"fuelLevel","scale":100},
+ "engine_on":{"path":"ignition","truthy":["ON"]},
+ "rpm":{"path":"engineRpm"},
+ "dtc":{"path":"faultCodes"},
+ "evt":{"path":"event"},
+ "seq":{"path":"sequence"}}}

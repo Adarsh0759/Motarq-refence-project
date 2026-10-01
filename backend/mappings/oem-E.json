@@ -1,0 +1,12 @@
+{"oem":"E","fields":{
+ "vin":{"path":"chassis"},
+ "ts":{"path":"unixTime","format":"epoch_ms"},
+ "lat":{"path":"coords.y"},"lon":{"path":"coords.x"},
+ "speed_kmh":{"path":"kph","unit":"kph"},
+ "odo_km":{"path":"odometer","unit":"km"},
+ "fuel_pct":{"path":"fuel","scale":100},
+ "engine_on":{"path":"running","truthy":["Y"]},
+ "rpm":{"path":"revs"},
+ "dtc":{"path":"dtcList"},
+ "evt":{"path":"event"},
+ "seq":{"path":"counter"}}}

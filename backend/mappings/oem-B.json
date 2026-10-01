@@ -1,0 +1,12 @@
+{"oem":"B","fields":{
+ "vin":{"path":"vin"},
+ "ts":{"path":"ts","format":"iso"},
+ "lat":{"path":"gps.0"},"lon":{"path":"gps.1"},
+ "speed_kmh":{"path":"speed_kmh","unit":"kmh"},
+ "odo_km":{"path":"odo_km","unit":"km"},
+ "fuel_pct":{"path":"fuel_pct"},
+ "engine_on":{"path":"engine_on","truthy":[true]},
+ "rpm":{"path":"rpm"},
+ "dtc":{"path":"dtc"},
+ "evt":{"path":"evt"},
+ "seq":{"path":"seq"}}}

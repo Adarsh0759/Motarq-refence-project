@@ -1,0 +1,5 @@
+apiVersion: v2
+name: fleetnorm
+description: FleetNorm stateless services (ingest, processor, api, ml, frontend). Stateful stores are expected as managed/external services.
+version: 1.0.0
+appVersion: "1.0.0"

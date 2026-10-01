@@ -1,0 +1,124 @@
+name: fleetnorm
+x-backend: &backend
+  build: { context: ../backend }
+  image: fleetnorm-backend
+  restart: unless-stopped
+  environment: &benv
+    KAFKA_BROKERS: redpanda:9092
+    PG_URL: postgres://fleet:fleet@postgres:5432/fleetnorm
+    MONGO_URL: mongodb://mongo:27017
+    CH_URL: http://clickhouse:8123
+    CH_USER: fleet
+    CH_PASS: fleet
+    REDIS_URL: redis://redis:6379
+    ML_URL: http://ml:8000
+    JWT_SECRET: ${JWT_SECRET:-dev-secret-change-me}
+    DEVICE_API_KEY: ${DEVICE_API_KEY:-dev-device-key}
+    IDLE_ALERT_MINUTES: ${IDLE_ALERT_MINUTES:-2}
+    CORS_ORIGIN: http://localhost:8080
+
+services:
+  redpanda:
+    image: redpandadata/redpanda:v24.2.7
+    command: >
+      redpanda start --overprovisioned --smp 2 --memory 1500M --reserve-memory 0M --node-id 0 --check=false
+      --kafka-addr internal://0.0.0.0:9092,external://0.0.0.0:19092
+      --advertise-kafka-addr internal://redpanda:9092,external://localhost:19092
+    ports: ["19092:19092", "9644:9644"]
+    healthcheck: { test: ["CMD-SHELL", "curl -sf localhost:9644/v1/status/ready || exit 1"], interval: 5s, timeout: 3s, retries: 30 }
+    volumes: [redpanda:/var/lib/redpanda/data]
+
+  redpanda-init:
+    image: redpandadata/redpanda:v24.2.7
+    depends_on: { redpanda: { condition: service_healthy } }
+    restart: "no"
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["rpk topic create raw.telemetry -p 12 -r 1 -X brokers=redpanda:9092 || true"]
+
+  postgres:
+    image: postgres:16-alpine
+    environment: { POSTGRES_USER: fleet, POSTGRES_PASSWORD: fleet, POSTGRES_DB: fleetnorm }
+    ports: ["5432:5432"]
+    volumes: [pg:/var/lib/postgresql/data, ../backend/db/postgres:/docker-entrypoint-initdb.d:ro]
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -U fleet -d fleetnorm"], interval: 5s, timeout: 3s, retries: 20 }
+
+  mongo:
+    image: mongo:7
+    ports: ["27017:27017"]
+    volumes: [mongo:/data/db]
+    healthcheck: { test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"], interval: 5s, timeout: 5s, retries: 20 }
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.8
+    environment: { CLICKHOUSE_USER: fleet, CLICKHOUSE_PASSWORD: fleet, CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: "1" }
+    ports: ["8123:8123"]
+    ulimits: { nofile: { soft: 262144, hard: 262144 } }
+    volumes: [ch:/var/lib/clickhouse, ../backend/db/clickhouse:/docker-entrypoint-initdb.d:ro]
+    healthcheck: { test: ["CMD-SHELL", "wget -q --spider http://localhost:8123/ping || exit 1"], interval: 5s, timeout: 3s, retries: 30 }
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--save", "", "--appendonly", "no", "--maxmemory", "1gb", "--maxmemory-policy", "volatile-ttl"]
+    ports: ["6379:6379"]
+    healthcheck: { test: ["CMD", "redis-cli", "ping"], interval: 5s, timeout: 3s, retries: 20 }
+
+  ml:
+    build: { context: ../ml }
+    restart: unless-stopped
+    ports: ["8000:8000"]
+
+  ingest:
+    <<: *backend
+    command: ["node", "src/ingest/index.js"]
+    ports: ["4001:4001"]
+    depends_on: { redpanda-init: { condition: service_completed_successfully }, mongo: { condition: service_healthy }, redis: { condition: service_healthy } }
+    healthcheck: { test: ["CMD", "node", "-e", "fetch('http://localhost:4001/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"], interval: 5s, timeout: 3s, retries: 20 }
+
+  processor:
+    <<: *backend
+    command: ["node", "src/processor/index.js"]
+    deploy: { replicas: 2 }
+    depends_on: &deps
+      redpanda-init: { condition: service_completed_successfully }
+      postgres: { condition: service_healthy }
+      mongo: { condition: service_healthy }
+      clickhouse: { condition: service_healthy }
+      redis: { condition: service_healthy }
+
+  api:
+    <<: *backend
+    command: ["node", "src/api/index.js"]
+    ports: ["4000:4000"]
+    depends_on: *deps
+    healthcheck: { test: ["CMD", "node", "-e", "fetch('http://localhost:4000/readyz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"], interval: 5s, timeout: 3s, retries: 20 }
+
+  frontend:
+    build: { context: ../frontend }
+    ports: ["8080:80"]
+    depends_on: [api]
+
+  simulator:
+    <<: *backend
+    profiles: ["sim"]
+    restart: "no"
+    command: ["node", "src/simulator/index.js", "--url", "http://ingest:4001"]
+    environment:
+      <<: *benv
+      VEHICLES: ${VEHICLES:-100000}
+      RATE: ${RATE:-2000}
+      DURATION: ${DURATION:-0}
+    depends_on: { ingest: { condition: service_healthy } }
+
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    volumes: [./prometheus.yml:/etc/prometheus/prometheus.yml:ro]
+    ports: ["9090:9090"]
+
+  grafana:
+    image: grafana/grafana:11.2.0
+    environment: { GF_SECURITY_ADMIN_PASSWORD: admin, GF_AUTH_ANONYMOUS_ENABLED: "true", GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer }
+    volumes: [./grafana/provisioning:/etc/grafana/provisioning:ro, ./grafana/dashboards:/var/lib/grafana/dashboards:ro]
+    ports: ["3000:3000"]
+    depends_on: [prometheus]
+
+volumes: { redpanda: {}, pg: {}, mongo: {}, ch: {} }

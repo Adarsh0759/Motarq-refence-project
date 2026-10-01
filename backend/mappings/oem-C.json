@@ -1,0 +1,12 @@
+{"oem":"C","fields":{
+ "vin":{"path":"VIN"},
+ "ts":{"path":"time","format":"ddmmyyyy_hms"},
+ "lat":{"path":"lat"},"lon":{"path":"lng"},
+ "speed_kmh":{"path":"speedMs","unit":"ms"},
+ "odo_km":{"path":"odoKm","unit":"km"},
+ "fuel_pct":{"path":"fuelPercent"},
+ "engine_on":{"path":"engine","truthy":[1]},
+ "rpm":{"path":"rpm"},
+ "dtc":{"path":"codes","split":";"},
+ "evt":{"path":"evt"},
+ "seq":{"path":"n"}}}

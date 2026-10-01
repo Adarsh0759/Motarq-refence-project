@@ -1,0 +1,88 @@
+Dataset: 500,000 alerts (95% acknowledged => ~25,000 open), 100,000 vehicles. PostgreSQL 16, local sandbox, warm cache, single run.
+Query: dashboard 'open alerts for tenant 1', newest first, LIMIT 50 (keyset page 1)
+
+===== BEFORE: partial index alert_open_idx dropped =====
+                                                                             QUERY PLAN                                                                              
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=2935.88..2936.01 rows=50 width=74) (actual time=687.605..687.642 rows=50 loops=1)
+   Buffers: shared hit=1197911 read=846
+   ->  Sort  (cost=2935.88..2936.19 rows=123 width=74) (actual time=687.604..687.636 rows=50 loops=1)
+         Sort Key: a.alert_id DESC
+         Sort Method: top-N heapsort  Memory: 36kB
+         Buffers: shared hit=1197911 read=846
+         ->  Nested Loop  (cost=14.31..2931.80 rows=123 width=74) (actual time=0.076..681.351 rows=25071 loops=1)
+               Buffers: shared hit=1197908 read=846
+               ->  Nested Loop  (cost=14.16..2910.96 rows=123 width=46) (actual time=0.065..664.737 rows=25071 loops=1)
+                     Buffers: shared hit=1147766 read=846
+                     ->  Hash Join  (cost=13.74..2353.17 rows=500 width=22) (actual time=0.053..36.727 rows=100000 loops=1)
+                           Hash Cond: (v.fleet_id = f.fleet_id)
+                           Buffers: shared hit=232 read=846
+                           ->  Seq Scan on vehicle v  (cost=0.00..2076.00 rows=100000 width=26) (actual time=0.011..13.359 rows=100000 loops=1)
+                                 Buffers: shared hit=231 read=845
+                           ->  Hash  (cost=13.67..13.67 rows=6 width=4) (actual time=0.026..0.047 rows=3 loops=1)
+                                 Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                                 Buffers: shared hit=1 read=1
+                                 ->  Bitmap Heap Scan on fleet f  (cost=4.20..13.67 rows=6 width=4) (actual time=0.018..0.020 rows=3 loops=1)
+                                       Recheck Cond: (tenant_id = 1)
+                                       Heap Blocks: exact=1
+                                       Buffers: shared hit=1 read=1
+                                       ->  Bitmap Index Scan on fleet_tenant_id_name_key  (cost=0.00..4.20 rows=6 width=0) (actual time=0.009..0.009 rows=3 loops=1)
+                                             Index Cond: (tenant_id = 1)
+                                             Buffers: shared read=1
+                     ->  Index Scan using alert_vehicle_idx on alert a  (cost=0.42..1.11 rows=1 width=32) (actual time=0.005..0.006 rows=0 loops=100000)
+                           Index Cond: (vehicle_id = v.vehicle_id)
+                           Filter: (status = 'open'::text)
+                           Rows Removed by Filter: 5
+                           Buffers: shared hit=1147534
+               ->  Index Scan using alert_type_pkey on alert_type t  (cost=0.15..0.17 rows=1 width=36) (actual time=0.000..0.000 rows=1 loops=25071)
+                     Index Cond: (alert_type_id = a.alert_type_id)
+                     Buffers: shared hit=50142
+ Planning:
+   Buffers: shared hit=358 read=21
+ Planning Time: 1.540 ms
+ Execution Time: 687.780 ms
+(37 rows)
+
+
+===== AFTER: partial index alert_open_idx recreated =====
+                                                                             QUERY PLAN                                                                              
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=2937.29..2937.41 rows=50 width=74) (actual time=769.297..769.313 rows=50 loops=1)
+   Buffers: shared hit=1198757
+   ->  Sort  (cost=2937.29..2937.61 rows=130 width=74) (actual time=769.295..769.307 rows=50 loops=1)
+         Sort Key: a.alert_id DESC
+         Sort Method: top-N heapsort  Memory: 36kB
+         Buffers: shared hit=1198757
+         ->  Nested Loop  (cost=14.31..2932.97 rows=130 width=74) (actual time=0.060..761.625 rows=25071 loops=1)
+               Buffers: shared hit=1198754
+               ->  Nested Loop  (cost=14.16..2910.96 rows=130 width=46) (actual time=0.049..739.839 rows=25071 loops=1)
+                     Buffers: shared hit=1148612
+                     ->  Hash Join  (cost=13.74..2353.17 rows=500 width=22) (actual time=0.039..46.828 rows=100000 loops=1)
+                           Hash Cond: (v.fleet_id = f.fleet_id)
+                           Buffers: shared hit=1078
+                           ->  Seq Scan on vehicle v  (cost=0.00..2076.00 rows=100000 width=26) (actual time=0.005..8.633 rows=100000 loops=1)
+                                 Buffers: shared hit=1076
+                           ->  Hash  (cost=13.67..13.67 rows=6 width=4) (actual time=0.021..0.023 rows=3 loops=1)
+                                 Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                                 Buffers: shared hit=2
+                                 ->  Bitmap Heap Scan on fleet f  (cost=4.20..13.67 rows=6 width=4) (actual time=0.013..0.015 rows=3 loops=1)
+                                       Recheck Cond: (tenant_id = 1)
+                                       Heap Blocks: exact=1
+                                       Buffers: shared hit=2
+                                       ->  Bitmap Index Scan on fleet_tenant_id_name_key  (cost=0.00..4.20 rows=6 width=0) (actual time=0.006..0.007 rows=3 loops=1)
+                                             Index Cond: (tenant_id = 1)
+                                             Buffers: shared hit=1
+                     ->  Index Scan using alert_vehicle_idx on alert a  (cost=0.42..1.11 rows=1 width=32) (actual time=0.006..0.007 rows=0 loops=100000)
+                           Index Cond: (vehicle_id = v.vehicle_id)
+                           Filter: (status = 'open'::text)
+                           Rows Removed by Filter: 5
+                           Buffers: shared hit=1147534
+               ->  Index Scan using alert_type_pkey on alert_type t  (cost=0.15..0.17 rows=1 width=36) (actual time=0.001..0.001 rows=1 loops=25071)
+                     Index Cond: (alert_type_id = a.alert_type_id)
+                     Buffers: shared hit=50142
+ Planning:
+   Buffers: shared hit=391
+ Planning Time: 1.341 ms
+ Execution Time: 769.414 ms
+(37 rows)
+

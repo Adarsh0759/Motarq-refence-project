@@ -1,0 +1,44 @@
+{{- range $name, $s := .Values.services }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: {{ $name }}, labels: { app: {{ $name }} } }
+spec:
+  replicas: {{ $s.replicas }}
+  selector: { matchLabels: { app: {{ $name }} } }
+  template:
+    metadata: { labels: { app: {{ $name }} } }
+    spec:
+      securityContext: { runAsNonRoot: true, runAsUser: 1000 }
+      containers:
+        - name: {{ $name }}
+          image: "{{ index $.Values.image $s.image }}:{{ $.Values.image.tag }}"
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
+          {{- if $s.command }}
+          command: {{ toJson $s.command }}
+          {{- end }}
+          ports: [{ containerPort: {{ $s.port }} }]
+          envFrom: [{ secretRef: { name: {{ $.Values.secretRefs }} } }]
+          env:
+            {{- range $k, $v := $.Values.env }}
+            - { name: {{ $k }}, value: {{ $v | quote }} }
+            {{- end }}
+          resources: { requests: { cpu: {{ $s.cpu | quote }}, memory: {{ $s.memory }} }, limits: { memory: {{ $s.memory }} } }
+          securityContext: { allowPrivilegeEscalation: false, readOnlyRootFilesystem: false }
+---
+apiVersion: v1
+kind: Service
+metadata: { name: {{ $name }} }
+spec: { selector: { app: {{ $name }} }, ports: [{ port: {{ $s.port }}, targetPort: {{ $s.port }} }] }
+{{- if $s.hpa }}
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata: { name: {{ $name }} }
+spec:
+  scaleTargetRef: { apiVersion: apps/v1, kind: Deployment, name: {{ $name }} }
+  minReplicas: {{ $s.hpa.min }}
+  maxReplicas: {{ $s.hpa.max }}
+  metrics: [{ type: Resource, resource: { name: cpu, target: { type: Utilization, averageUtilization: {{ $s.hpa.cpu }} } } }]
+{{- end }}
+{{- end }}

@@ -1,0 +1,18 @@
+# UNVALIDATED chart: run `helm lint` and `helm template` before use.
+image: { backend: fleetnorm-backend, ml: fleetnorm-ml, frontend: fleetnorm-frontend, tag: latest, pullPolicy: IfNotPresent }
+env:        # point at managed Kafka/Postgres/Mongo/ClickHouse/Redis
+  KAFKA_BROKERS: kafka:9092
+  PG_URL: postgres://fleet:CHANGE@postgres:5432/fleetnorm
+  MONGO_URL: mongodb://mongo:27017
+  CH_URL: http://clickhouse:8123
+  CH_USER: fleet
+  REDIS_URL: redis://redis:6379
+  ML_URL: http://ml:8000
+  NODE_ENV: production
+secretRefs: fleetnorm-secrets    # create: kubectl create secret generic fleetnorm-secrets --from-literal=JWT_SECRET=... --from-literal=DEVICE_API_KEY=... --from-literal=CH_PASS=...
+services:
+  ingest:    { image: backend, command: ["node","src/ingest/index.js"],    port: 4001, replicas: 3, cpu: "1",   memory: 512Mi, hpa: { min: 3, max: 20, cpu: 65 } }
+  processor: { image: backend, command: ["node","src/processor/index.js"], port: 9102, replicas: 4, cpu: "2",   memory: 1Gi,   hpa: { min: 4, max: 12, cpu: 70 } }
+  api:       { image: backend, command: ["node","src/api/index.js"],       port: 4000, replicas: 2, cpu: "500m", memory: 512Mi, hpa: { min: 2, max: 10, cpu: 70 } }
+  ml:        { image: ml,      command: [],                                 port: 8000, replicas: 1, cpu: "500m", memory: 512Mi }
+  frontend:  { image: frontend, command: [],                                port: 80,   replicas: 2, cpu: "100m", memory: 128Mi }
