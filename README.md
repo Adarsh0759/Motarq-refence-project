@@ -28,12 +28,6 @@ Open **http://localhost:8080** · Grafana http://localhost:3000 (anonymous viewe
 | viewer@fleetnorm.dev / Viewer@123 | viewer (read-only, coordinates masked) |
 | admin@otherco.dev / Other@123 | second tenant (proves isolation; sees no data) |
 
-## 3-minute demo script
-1. `make sim` is running → Dashboard: active vehicles, events/s, live map, live alerts (set `IDLE_ALERT_MINUTES=2` is the default in compose).
-2. **Onboarding E (the wow moment):** OEM E is already *sending* but has no mapping → **OEM Onboarding** tab shows `no_mapping` dead-letter counters climbing. Click *Preview normalisation* (sample pre-filled) → *Save as new version* → *Activate*. Counters stop growing; OEM E vehicles appear on the map. **No restart, no deploy.**
-3. Insights: idling cost by vehicle/fleet (assumptions shown), utilisation, risk ranking (ML).
-4. Log in as **viewer**: coordinates are rounded, ack button hidden, admin tab absent. Log in as **other tenant**: empty.
-5. Grafana: throughput, e2e latency, lag, dedup hits. `make chaos` kills the broker live.
 
 ## What was verified, and what was not
 **Verified by running it (in a sandbox, during the build):**
