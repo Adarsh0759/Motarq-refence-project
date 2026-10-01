@@ -57,7 +57,7 @@ export function Alerts() {
 
       <Card>
         <CardHeader className="flex-row items-center justify-between">
-          <CardTitle className="normal-case text-sm text-foreground tracking-normal">Alert queue</CardTitle>
+          <CardTitle>Alert queue</CardTitle>
           <Tabs value={status} onValueChange={(v) => setStatus(v as AlertStatus)}>
             <TabsList>
               {STATUSES.map((s) => (

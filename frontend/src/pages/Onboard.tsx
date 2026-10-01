@@ -95,7 +95,7 @@ export function Onboard() {
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle className="normal-case text-sm tracking-normal text-foreground">1. Mapping (JSON)</CardTitle>
+            <CardTitle>1. Mapping (JSON)</CardTitle>
           </CardHeader>
           <CardContent>
             <Textarea rows={20} value={mapping} onChange={(e) => setMapping(e.target.value)} spellCheck={false} />
@@ -103,7 +103,7 @@ export function Onboard() {
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle className="normal-case text-sm tracking-normal text-foreground">2. Sample raw payload from the new OEM</CardTitle>
+            <CardTitle>2. Sample raw payload from the new OEM</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <Textarea rows={11} value={payload} onChange={(e) => setPayload(e.target.value)} spellCheck={false} />
@@ -127,7 +127,7 @@ export function Onboard() {
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle className="normal-case text-sm tracking-normal text-foreground">Mapping versions</CardTitle>
+            <CardTitle>Mapping versions</CardTitle>
           </CardHeader>
           <CardContent>
             {!list || list.length === 0 ? (
@@ -165,7 +165,7 @@ export function Onboard() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="normal-case text-sm tracking-normal text-foreground">
+            <CardTitle>
               <span className="flex items-center gap-2">
                 <AlertTriangle className="h-3.5 w-3.5 text-muted-foreground" /> Dead-letter counters (events rejected)
               </span>

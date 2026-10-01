@@ -135,7 +135,7 @@ export function Insights() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center justify-between normal-case tracking-normal text-foreground text-sm">
+            <CardTitle className="flex items-center justify-between">
               <span className="flex items-center gap-2">
                 <AlertTriangle className="h-3.5 w-3.5 text-muted-foreground" /> Breakdown risk ranking
               </span>

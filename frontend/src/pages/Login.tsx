@@ -1,15 +1,18 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ShieldCheck, Loader2, AlertCircle } from 'lucide-react';
+import { Loader2, AlertCircle, Sun, Moon } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
+import { useTheme } from '@/lib/theme';
 import { ApiError } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
+import { LogoMark } from '@/components/Logo';
 
 export function Login() {
   const { login } = useAuth();
+  const { theme, toggle } = useTheme();
   const [email, setEmail] = useState('admin@fleetnorm.dev');
   const [password, setPassword] = useState('Admin@123');
   const [err, setErr] = useState('');
@@ -32,14 +35,22 @@ export function Login() {
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background p-5">
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute left-1/2 top-0 h-[600px] w-[900px] -translate-x-1/2 rounded-full bg-primary/10 blur-[120px]" />
-        <div className="absolute bottom-0 right-0 h-[400px] w-[500px] rounded-full bg-indigo-500/10 blur-[100px]" />
+        <div className="absolute bottom-0 right-0 h-[400px] w-[500px] rounded-full bg-violet-500/10 blur-[100px]" />
       </div>
+
+      <button
+        onClick={toggle}
+        className="absolute right-5 top-5 z-10 flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-card text-muted-foreground shadow-sm transition-colors hover:text-foreground"
+        aria-label="Toggle theme"
+      >
+        {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+      </button>
 
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, ease: 'easeOut' }} className="relative z-10 w-full max-w-sm">
         <Card className="p-8 shadow-2xl">
           <div className="mb-6 flex flex-col items-center text-center">
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-indigo-500 shadow-lg shadow-primary/30">
-              <ShieldCheck className="h-6 w-6 text-white" />
+            <div className="mb-4">
+              <LogoMark size={48} />
             </div>
             <h1 className="text-xl font-bold">FleetNorm</h1>
             <p className="mt-1 text-sm text-muted-foreground">Multi-OEM fleet telemetry intelligence</p>

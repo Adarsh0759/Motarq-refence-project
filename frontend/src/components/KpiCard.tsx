@@ -1,45 +1,45 @@
-import type { LucideIcon } from 'lucide-react';
+import type { ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Sparkline } from '@/components/Sparkline';
 import { AnimatedNumber } from '@/components/AnimatedNumber';
+import { useHistory } from '@/lib/useHistory';
 import { cn } from '@/lib/utils';
 
-type Tone = 'default' | 'bad' | 'warn' | 'ok';
-
-const toneStyles: Record<Tone, string> = {
-  default: 'bg-primary/15 text-primary',
-  bad: 'bg-destructive/15 text-destructive',
-  warn: 'bg-warning/15 text-warning',
-  ok: 'bg-success/15 text-success',
-};
-
 interface KpiCardProps {
-  icon: LucideIcon;
   label: string;
   value: number | null;
   prefix?: string;
-  hint?: string;
-  tone?: Tone;
+  delta?: ReactNode;
+  gradient?: boolean;
+  sparklineColor?: string;
 }
 
-export function KpiCard({ icon: Icon, label, value, prefix, hint, tone = 'default' }: KpiCardProps) {
+export function KpiCard({ label, value, prefix, delta, gradient, sparklineColor }: KpiCardProps) {
+  const history = useHistory(value, 24);
+
   return (
     <motion.div whileHover={{ y: -2 }} transition={{ type: 'spring', stiffness: 300, damping: 24 }}>
-      <Card className="relative overflow-hidden p-5">
-        <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-primary to-transparent opacity-80" />
-        <div className={cn('mb-3 flex h-8 w-8 items-center justify-center rounded-lg', toneStyles[tone])}>
-          <Icon className="h-4 w-4" />
+      <Card
+        className={cn('flex flex-1 flex-col gap-3 border-0 p-5', gradient && 'bg-accent-gradient text-primary-foreground shadow-lg shadow-primary/20')}
+      >
+        <div className="flex items-center">
+          <span className={cn('text-[13px] font-medium', gradient ? 'text-primary-foreground/85' : 'text-muted-foreground')}>{label}</span>
+          <span className="flex-1" />
+          {delta}
         </div>
-        <div className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</div>
-        {value === null ? (
-          <Skeleton className="h-8 w-20" />
-        ) : (
-          <div className="text-[28px] font-extrabold leading-none tracking-tight tabular-nums">
-            <AnimatedNumber value={value} prefix={prefix} />
-          </div>
-        )}
-        {hint && <div className="mt-1.5 text-xs text-muted-foreground">{hint}</div>}
+        <div className="flex items-end">
+          {value === null ? (
+            <Skeleton className="h-9 w-20" />
+          ) : (
+            <span className="text-[34px] font-bold leading-none tracking-tight tabular-nums">
+              <AnimatedNumber value={value} prefix={prefix} />
+            </span>
+          )}
+          <span className="flex-1" />
+          <Sparkline data={history} color={sparklineColor ?? (gradient ? 'white' : 'hsl(var(--primary))')} />
+        </div>
       </Card>
     </motion.div>
   );
