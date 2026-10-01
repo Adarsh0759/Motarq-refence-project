@@ -1,0 +1,68 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 222 28% 5%;
+    --foreground: 210 30% 96%;
+    --card: 222 24% 7%;
+    --card-foreground: 210 30% 96%;
+    --popover: 222 24% 8%;
+    --popover-foreground: 210 30% 96%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 210 40% 99%;
+    --secondary: 222 18% 13%;
+    --secondary-foreground: 210 20% 90%;
+    --muted: 222 18% 12%;
+    --muted-foreground: 220 12% 60%;
+    --accent: 222 18% 15%;
+    --accent-foreground: 210 20% 92%;
+    --destructive: 0 72% 55%;
+    --destructive-foreground: 210 40% 99%;
+    --success: 160 70% 42%;
+    --success-foreground: 210 40% 99%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 26 40% 10%;
+    --border: 222 16% 16%;
+    --input: 222 16% 16%;
+    --ring: 217 91% 60%;
+    --sidebar: 224 32% 4%;
+    --sidebar-foreground: 210 20% 88%;
+    --sidebar-border: 222 18% 12%;
+    --radius: 0.75rem;
+  }
+}
+
+@layer base {
+  * { @apply border-border; }
+  html { color-scheme: dark; }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: 'cv11', 'ss01';
+  }
+  ::selection { @apply bg-primary/30; }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { @apply bg-border rounded-full border-2 border-transparent bg-clip-padding; }
+  ::-webkit-scrollbar-thumb:hover { @apply bg-muted-foreground/40; }
+}
+
+@layer utilities {
+  .text-balance { text-wrap: balance; }
+  .tabular-nums { font-variant-numeric: tabular-nums; }
+  .skeleton-shimmer {
+    background: linear-gradient(90deg, hsl(var(--muted)) 25%, hsl(var(--accent)) 50%, hsl(var(--muted)) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.6s ease-in-out infinite;
+  }
+}
+
+#map-root { height: 100%; width: 100%; }
+#map-root .leaflet-tile-pane { filter: saturate(0.25) brightness(0.8) invert(1) hue-rotate(180deg) contrast(0.9); }
+#map-root .leaflet-control-attribution { background: hsl(var(--background) / 0.8); color: hsl(var(--muted-foreground)); font-size: 10px; }
+#map-root .leaflet-control-attribution a { color: hsl(var(--foreground)); }
+#map-root .leaflet-control-zoom a { background: hsl(var(--card)); color: hsl(var(--foreground)); border-color: hsl(var(--border)) !important; }
+#map-root .leaflet-control-zoom a:hover { background: hsl(var(--accent)); }

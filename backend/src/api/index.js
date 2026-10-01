@@ -1,4 +1,5 @@
 // API service: JWT auth, RBAC, tenant isolation, audit log, keyset pagination, insights, OEM onboarding, erasure, SSE.
+import crypto from 'node:crypto';
 import express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
@@ -8,6 +9,7 @@ import { z } from 'zod';
 import rateLimit from 'express-rate-limit';
 import { RedisStore } from 'rate-limit-redis';
 import CircuitBreaker from 'opossum';
+import swaggerUi from 'swagger-ui-express';
 import { cfg } from '../shared/config.js';
 import { logger } from '../shared/logger.js';
 import { client, register } from '../shared/metrics.js';
@@ -16,6 +18,7 @@ import { MAPPING_CHANNEL } from '../shared/mappings.js';
 import { MappingInput } from '../shared/schema.js';
 import { normaliseAndValidate } from '../processor/normalise.js';
 import { clampInt, maskLocation, idleCost, ruleRisk, cursorOf } from './util.js';
+import { openapiSpec } from './openapi.js';
 
 const pool = pgPool(30); const ch = clickhouse(); const r = redis(); const subR = redis({ enableReadyCheck: false });
 const mg = await mongo(); const db = mg.db(cfg.mongoDb);
@@ -35,9 +38,21 @@ app.disable('x-powered-by'); app.set('trust proxy', 1);
 app.use(helmet()); app.use(cors({ origin: cfg.corsOrigin })); app.use(express.json({ limit: '100kb' }));
 app.use((req, res, next) => { const end = httpH.startTimer(); res.on('finish', () => end({ method: req.method, route: req.route?.path || req.path.split('/').slice(0, 3).join('/'), status: res.statusCode })); next(); });
 
+// correlation id on every request/response, folded into every JSON body (success or error) so a
+// user-reported error can be grepped straight out of the structured logs.
+app.use((req, res, next) => {
+  req.id = req.get('x-request-id') || crypto.randomUUID();
+  res.set('X-Request-Id', req.id);
+  const json = res.json.bind(res);
+  res.json = (body) => json(body && typeof body === 'object' && !Array.isArray(body) ? { ...body, request_id: req.id } : body);
+  next();
+});
+
 app.get('/healthz', (_q, s) => s.send('ok'));
 app.get('/readyz', async (_q, s) => { try { await pool.query('SELECT 1'); s.send('ready'); } catch { s.status(503).send('not ready'); } });
 app.get('/metrics', async (_q, s) => { s.set('Content-Type', register.contentType); s.end(await register.metrics()); });
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(openapiSpec, { customSiteTitle: 'FleetNorm API docs' }));
+app.get('/api/openapi.json', (_q, s) => s.json(openapiSpec));
 
 const mkLimiter = (max, windowMs, prefix) => rateLimit({ windowMs, limit: max, standardHeaders: true, legacyHeaders: false,
   store: new RedisStore({ sendCommand: (...a) => r.call(...a), prefix }), message: { error: 'rate_limited' } });
