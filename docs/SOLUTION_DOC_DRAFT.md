@@ -34,11 +34,11 @@ Scale (10K vs 100K vehicles): **TODO:MEASURE** or state as estimate. Wider impac
 | ID | Feature | Priority | Status | Code path | Video |
 |---|---|---|---|---|---|
 | F-01 | Multi-OEM normalisation (A-E) via mappings | Must | Done | `backend/src/processor/normalise.js`, `backend/mappings/` | TODO |
-| F-02 | Zero-downtime OEM onboarding UI | Must | Done* | `backend/src/api/index.js` (`/admin/oem-mappings`), `frontend/src/pages/Onboard.jsx` | TODO |
+| F-02 | Zero-downtime OEM onboarding UI | Must | Done* | `backend/src/api/index.js` (`/admin/oem-mappings`), `frontend/src/pages/Onboard.tsx` | TODO |
 | F-03 | Device-authenticated ingest with back-pressure + circuit breaker | Must | Done* | `backend/src/ingest/index.js` | TODO |
 | F-04 | Idempotent processing + out-of-order handling | Must | Done* | `backend/src/processor/index.js` | TODO |
 | F-05 | Streaming rules (idling, harsh-brake, DTC, overspeed, low fuel) | Must | Done | `backend/src/processor/rules.js` | TODO |
-| F-06 | Live dashboard (KPIs, map, SSE alerts) | Must | Done* | `frontend/src/pages/Dashboard.jsx` | TODO |
+| F-06 | Live dashboard (KPIs, map, SSE alerts) | Must | Done* | `frontend/src/pages/Dashboard.tsx` | TODO |
 | F-07 | Idling-cost & utilisation insights | Must | Done* | `/api/insights/*`, `db/clickhouse/01-schema.sql` | TODO |
 | F-08 | JWT auth, RBAC, tenant isolation, audit log | Must | Done | `backend/src/api/index.js` | TODO |
 | F-09 | Right to erasure, location masking | Should | Done | `api/util.js`, `/admin/drivers/:id/erase` | TODO |
@@ -54,7 +54,7 @@ Scale (10K vs 100K vehicles): **TODO:MEASURE** or state as estimate. Wider impac
 | Messaging | Redpanda (Kafka API) | replay + per-VIN ordering; rejected RabbitMQ (ADR-1) |
 | Processing | Node consumers, partition-parallel | one language with the API; rejected Flink/Spark (operational weight for rule-level logic) |
 | Stores | Postgres 3NF, ClickHouse, MongoDB, Redis | polyglot by access pattern (ADR-3); no vector store (ADR-5) |
-| Backend/Frontend | Express; React + Vite | team strength (MERN), fast delivery |
+| Backend/Frontend | Express; React + TypeScript + Vite, Tailwind CSS, Radix UI primitives, TanStack Query, React Router, Framer Motion | team strength (MERN) extended with a typed, token-driven design system (light/dark theme) for production-grade UI polish; fast delivery |
 | ML | scikit-learn + FastAPI | small tabular problem; no LLM needed |
 | Infra | Docker Compose, Helm (unvalidated), Terraform (unvalidated), GitHub Actions, Prometheus/Grafana | |
 **5.3 Data:** ER diagram `docs/erd.md` (3NF; no deliberate denormalisation). CAP map in ADR-3. **Capacity (estimate, label as such):** ~250 B/event JSON × 100K eps ≈ 25 MB/s ≈ 2.2 TB/day raw; ≈ 8.6 B rows/day; ClickHouse compressed size **TODO:MEASURE** (`system.parts`). Partition key: VIN (Kafka), day (ClickHouse). Retention: 365 d TTL implemented; hot/warm/cold in ADR-2.
