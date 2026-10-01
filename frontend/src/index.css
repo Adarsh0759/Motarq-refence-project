@@ -37,7 +37,7 @@
     --sidebar-border: 222 25% 15%;
     --map-card: 218 53% 9%;
     --map-card-foreground: 210 20% 88%;
-    --radius: 1rem;
+    --radius: 0rem;
   }
 
   .dark {
@@ -84,7 +84,7 @@
   ::selection { @apply bg-primary/20; }
   ::-webkit-scrollbar { width: 10px; height: 10px; }
   ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { @apply bg-border rounded-full border-2 border-transparent bg-clip-padding; }
+  ::-webkit-scrollbar-thumb { @apply bg-border rounded-none; }
   ::-webkit-scrollbar-thumb:hover { @apply bg-muted-foreground/40; }
 }
 

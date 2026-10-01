@@ -40,7 +40,7 @@ export function Login() {
 
       <button
         onClick={toggle}
-        className="absolute right-5 top-5 z-10 flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-card text-muted-foreground shadow-sm transition-colors hover:text-foreground"
+        className="absolute right-5 top-5 z-10 flex h-9 w-9 items-center justify-center rounded-none border border-border bg-card text-muted-foreground shadow-sm transition-colors hover:text-foreground"
         aria-label="Toggle theme"
       >
         {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
@@ -75,7 +75,7 @@ export function Login() {
               )}
             </Button>
             {err && (
-              <motion.p initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="flex items-center gap-2 rounded-md border border-destructive/20 bg-destructive/10 px-3 py-2 text-xs text-destructive">
+              <motion.p initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="flex items-center gap-2 rounded-none border border-destructive/20 bg-destructive/10 px-3 py-2 text-xs text-destructive">
                 <AlertCircle className="h-3.5 w-3.5 flex-none" /> {err}
               </motion.p>
             )}

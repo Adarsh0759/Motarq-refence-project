@@ -78,8 +78,8 @@ export function Dashboard() {
           <p className="text-[13px] text-muted-foreground">Real-time fleet health across all OEMs</p>
         </div>
         <span className="flex-1" />
-        <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-[13px] font-medium shadow-sm">All fleets</div>
-        <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-[13px] font-medium shadow-sm">Last 7 days</div>
+        <div className="flex items-center gap-2 rounded-none border border-border bg-card px-3 py-2 text-[13px] font-medium shadow-sm">All fleets</div>
+        <div className="flex items-center gap-2 rounded-none border border-border bg-card px-3 py-2 text-[13px] font-medium shadow-sm">Last 7 days</div>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -92,7 +92,7 @@ export function Dashboard() {
           prefix="₹"
           gradient
           delta={
-            <span className="rounded-full bg-white/20 px-2 py-0.5 text-[11px] font-semibold text-white">{trendDelta(costHist, true).label}</span>
+            <span className="rounded-none bg-white/20 px-2 py-0.5 text-[11px] font-semibold text-white">{trendDelta(costHist, true).label}</span>
           }
         />
       </div>
@@ -103,7 +103,7 @@ export function Dashboard() {
             <CardTitle className="text-white">
               <MapIcon className="h-4 w-4 text-slate-400" /> Live fleet
             </CardTitle>
-            <span className="flex items-center gap-1.5 rounded-full bg-success/15 px-2.5 py-1 text-[11px] font-semibold text-success">
+            <span className="flex items-center gap-1.5 rounded-none bg-success/15 px-2.5 py-1 text-[11px] font-semibold text-success">
               <span className="h-1.5 w-1.5 rounded-full bg-success" /> Live
             </span>
             <span className="flex-1" />
@@ -119,9 +119,9 @@ export function Dashboard() {
               </span>
             </div>
           </div>
-          <div className="relative min-h-[420px] flex-1 overflow-hidden rounded-xl">
+          <div className="relative min-h-[420px] flex-1 overflow-hidden rounded-none">
             <div id="map-root" />
-            <div className="pointer-events-none absolute bottom-3 left-3 z-[400] rounded-lg bg-black/40 px-2.5 py-1.5 text-[11px] font-medium text-slate-300 backdrop-blur">
+            <div className="pointer-events-none absolute bottom-3 left-3 z-[400] rounded-none bg-black/40 px-2.5 py-1.5 text-[11px] font-medium text-slate-300 backdrop-blur">
               Showing latest 400 vehicles
             </div>
           </div>
@@ -184,8 +184,8 @@ export function Dashboard() {
                       <span className="flex-1" />
                       <span className="font-semibold">₹{f.cost_inr.toLocaleString()}</span>
                     </div>
-                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                      <div className="h-full rounded-full bg-accent-gradient" style={{ width: `${(f.cost_inr / maxFleetCost) * 100}%` }} />
+                    <div className="h-1.5 w-full overflow-hidden rounded-none bg-muted">
+                      <div className="h-full rounded-none bg-accent-gradient" style={{ width: `${(f.cost_inr / maxFleetCost) * 100}%` }} />
                     </div>
                   </div>
                 ))

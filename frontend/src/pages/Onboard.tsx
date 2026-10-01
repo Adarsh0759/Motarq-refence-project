@@ -116,7 +116,7 @@ export function Onboard() {
               </Button>
             </div>
             {preview && (
-              <pre className={`overflow-auto rounded-md border p-3 font-mono text-xs leading-relaxed ${preview.ok ? 'border-success/20 bg-success/5 text-success' : 'border-destructive/20 bg-destructive/5 text-destructive'}`}>
+              <pre className={`overflow-auto rounded-none border p-3 font-mono text-xs leading-relaxed ${preview.ok ? 'border-success/20 bg-success/5 text-success' : 'border-destructive/20 bg-destructive/5 text-destructive'}`}>
                 {JSON.stringify(preview.ok ? preview.event : preview.reason, null, 2)}
               </pre>
             )}

@@ -34,7 +34,7 @@ export function Sidebar() {
           <Logo size={38} wordmarkClassName="text-[18px] font-bold tracking-[-0.3px] text-white [&_span:last-child]:text-sky-300" />
           <button
             onClick={toggle}
-            className="flex h-7 w-7 flex-none items-center justify-center rounded-lg text-sidebar-foreground/60 transition-colors hover:bg-white/10 hover:text-white"
+            className="flex h-7 w-7 flex-none items-center justify-center rounded-none text-sidebar-foreground/60 transition-colors hover:bg-white/10 hover:text-white"
             aria-label="Toggle theme"
           >
             {theme === 'dark' ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
@@ -50,7 +50,7 @@ export function Sidebar() {
               end={end}
               className={({ isActive }) =>
                 cn(
-                  'group relative flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-medium text-slate-400 transition-colors hover:text-white',
+                  'group relative flex items-center gap-3 rounded-none px-3.5 py-3 text-sm font-medium text-slate-400 transition-colors hover:text-white',
                   isActive && 'text-white',
                 )
               }
@@ -60,14 +60,14 @@ export function Sidebar() {
                   {isActive && (
                     <motion.div
                       layoutId="nav-active"
-                      className="absolute inset-0 rounded-xl bg-accent-gradient shadow-[0_6px_18px_-4px_rgba(37,99,235,0.45)]"
+                      className="absolute inset-0 rounded-none bg-accent-gradient shadow-[0_6px_18px_-4px_rgba(37,99,235,0.45)]"
                       transition={{ type: 'spring', bounce: 0.25, duration: 0.4 }}
                     />
                   )}
                   <Icon className="relative z-10 h-[18px] w-[18px]" />
                   <span className="relative z-10 font-medium">{label}</span>
                   {!!badge && (
-                    <span className="relative z-10 ml-auto rounded-full bg-destructive px-[7px] py-px text-[11px] font-bold text-white">{badge}</span>
+                    <span className="relative z-10 ml-auto rounded-none bg-destructive px-[7px] py-px text-[11px] font-bold text-white">{badge}</span>
                   )}
                 </>
               )}
@@ -78,7 +78,7 @@ export function Sidebar() {
               to="/onboarding"
               className={({ isActive }) =>
                 cn(
-                  'group relative flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-medium text-slate-400 transition-colors hover:text-white',
+                  'group relative flex items-center gap-3 rounded-none px-3.5 py-3 text-sm font-medium text-slate-400 transition-colors hover:text-white',
                   isActive && 'text-white',
                 )
               }
@@ -88,7 +88,7 @@ export function Sidebar() {
                   {isActive && (
                     <motion.div
                       layoutId="nav-active"
-                      className="absolute inset-0 rounded-xl bg-accent-gradient shadow-[0_6px_18px_-4px_rgba(37,99,235,0.45)]"
+                      className="absolute inset-0 rounded-none bg-accent-gradient shadow-[0_6px_18px_-4px_rgba(37,99,235,0.45)]"
                       transition={{ type: 'spring', bounce: 0.25, duration: 0.4 }}
                     />
                   )}
@@ -102,7 +102,7 @@ export function Sidebar() {
       </div>
 
       <div className="relative z-10 flex flex-col gap-3">
-        <div className="flex flex-col gap-2 rounded-2xl border border-white/[0.08] bg-white/[0.06] p-3.5">
+        <div className="flex flex-col gap-2 rounded-none border border-white/[0.08] bg-white/[0.06] p-3.5">
           <div className="flex items-center gap-2">
             <span className="relative flex h-2 w-2">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-60" />
@@ -113,7 +113,7 @@ export function Sidebar() {
           <p className="text-xs text-slate-400">Consumer lag 0 · 2 replicas</p>
         </div>
 
-        <div className="flex items-center gap-2.5 rounded-xl p-1">
+        <div className="flex items-center gap-2.5 rounded-none p-1">
           <div className="flex h-9 w-9 flex-none items-center justify-center rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 text-xs font-bold text-white">
             {role.slice(0, 2).toUpperCase()}
           </div>
