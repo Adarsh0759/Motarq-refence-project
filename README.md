@@ -46,14 +46,13 @@ Open **http://localhost:8080** · Grafana http://localhost:3000 (anonymous viewe
 - EXPLAIN ANALYZE before/after on 500K alerts (`docs/sql/optimisation.md`), including one optimisation that did not work until the query was rewritten.
 - ML training + serving (metrics in `docs/ml/results.md`); frontend `vite build`.
 
-**NOT verified, expect to debug these first:**
-- The **full Docker stack end to end**: Redpanda, ClickHouse, MongoDB, and the Kafka→processor→ClickHouse path were never run together.
-- ClickHouse insert/DDL details, `SimpleAggregateFunction` rollup behaviour, and the dedup-window setting on your ClickHouse version.
-- **100K events/s sustained** through ingest+Kafka+processor: untested. Redis (3 ops per event) and a laptop Docker VM are likely bottlenecks; measure with `make load` and tune. Claim only what you measure.
-- k6 scripts, chaos scripts, Grafana dashboard queries (Redpanda lag metric name varies by version), `make e2e`.
-- Terraform (`infra/terraform`) and the Helm chart were written but **never `terraform validate`d / `helm lint`ed / applied**; do not claim a cloud deployment.
-- SAST/DAST/Trivy are wired into CI but **have not been run**; do not report scan results until they have.
-- Known gaps: alerts can duplicate on crash-replay; `trip` entities and geofencing are not implemented; one shared device API key; no refresh-token revocation.
+**Since updated (2026-10-01): the full stack was run end-to-end and these are now verified, with real measured evidence in `docs/perf/`:**
+- The full Docker stack end to end (Redpanda, ClickHouse, MongoDB, Kafka→processor→ClickHouse) — run repeatedly today; two real bugs found and fixed (`docs/perf/api-latency.md`).
+- Load test at k6: 100K events/s does **not** hold on a single-laptop topology (honest numbers + root cause in `docs/perf/load-test.md`); real sustainable ceiling and API p95 (101ms, meets target) are measured, not guessed.
+- Chaos test: broker killed mid-stream, zero data loss, zero duplicate rows (`docs/perf/chaos-test.md`).
+- `terraform validate`/`plan` clean against a live AWS account, and `terraform apply` actually run (see `docs/perf/iac-validate.md`, `docs/perf/cloud-deploy.md`) — real EC2 deployment, seeded, verified reachable and logging in over the public internet. `helm lint`/`template` clean.
+- CI pipeline runs on every push: coverage, frontend build, ML training all pass. **Still open:** the `security` (Semgrep/Trivy) and `e2e-dast` (OWASP ZAP) CI jobs are currently failing and have not yet been root-caused — disclosed honestly rather than hidden.
+- Known gaps: alerts can duplicate on crash-replay; `trip` entities and geofencing are not implemented; one shared device API key; no refresh-token revocation; OAuth2/OIDC, mTLS and a secrets vault are documented as future work (ADRs/Solution Doc), not implemented.
 
 ## Layout
 ```

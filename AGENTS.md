@@ -13,8 +13,8 @@ Node 20 ESM backend (ingest/processor/api/simulator share `backend/`), React+Vit
 - Secrets: none in git. `NODE_ENV=production` refuses default secrets (compose runs in development mode on purpose).
 - Shell scripts need bash; Makefile recipes need tabs.
 
-## Known untested areas (debug first)
-Full docker stack end-to-end, ClickHouse DDL/insert settings + rollup MV, Kafka consumer path, Grafana queries, k6/chaos scripts, Terraform, Helm.
+## Status (2026-10-01)
+Full docker stack, ClickHouse/Kafka path, k6/chaos scripts, Terraform (validated + applied to real AWS), Helm — all run, see `docs/perf/`. Still open: CI `security`/`e2e-dast` jobs failing (not root-caused), demo video, Word-template Solution Doc.
 
 ## Git
 Sole author/owner: Adarsh Anand (adarshchotu09@gmail.com). Never mention any AI tool, model, or vendor name in commit messages, PR descriptions, or contributor metadata.
