@@ -54,13 +54,13 @@ backend/   ingest, processor, api, simulator (Node 20 ESM, one image, four entry
 frontend/  React + Vite (nginx in Docker)
 ml/        scikit-learn training + FastAPI serving
 infra/     docker-compose, prometheus, grafana, k6, chaos, terraform, helm
-docs/      adr/ architecture erd stride algorithms sql/ ml/ perf/ compliance SOLUTION_DOC_DRAFT
+docs/      adr/ architecture erd stride algorithms sql/ ml/ perf/ compliance
 ```
 
 ## Submission checklist
 - [x] `make up && make seed && make sim` works end-to-end — run 2026-10-01, two real bugs found and fixed along the way (see `docs/perf/`)
 - [x] `make coverage`, `make load`, `make chaos`: real outputs in `docs/perf/load-test.md`, `docs/perf/chaos-test.md`, `docs/perf/api-latency.md`. `make explain` output already in `docs/perf/explain-output.txt`
-- [ ] Screenshots, 5-minute demo video, fill the Word template (`docs/SOLUTION_DOC_DRAFT.md` is pre-written and now has real numbers filled in)
+- [ ] Screenshots, 5-minute demo video, Word Solution Document (filled directly from the repo's real evidence: `docs/adr/`, `docs/architecture.md`, `docs/erd.md`, `docs/algorithms.md`, `docs/sql/`, `docs/stride.md`, `docs/perf/`, `docs/ml/`)
 - [x] Declare AI + open-source tools (below)
 - [ ] `git tag v1.0-submission` on the final commit; submit **well before the 8 pm deadline**
 - [x] Pushed to GitHub: https://github.com/Adarsh0759/Motarq-refence-project — CI runs on every push (`.github/workflows/ci.yml`: coverage gate, frontend build, ML training, SAST/Trivy/dependency-audit, e2e smoke + DAST)
