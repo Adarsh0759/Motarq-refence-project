@@ -46,7 +46,7 @@ Open **http://localhost:8080** · Grafana http://localhost:3000 (anonymous viewe
 - EXPLAIN ANALYZE before/after on 500K alerts (`docs/sql/optimisation.md`), including one optimisation that did not work until the query was rewritten.
 - ML training + serving (metrics in `docs/ml/results.md`); frontend `vite build`.
 
-**NOT verified, expect to debug these first (this is what Claude Code is for):**
+**NOT verified, expect to debug these first:**
 - The **full Docker stack end to end**: Redpanda, ClickHouse, MongoDB, and the Kafka→processor→ClickHouse path were never run together.
 - ClickHouse insert/DDL details, `SimpleAggregateFunction` rollup behaviour, and the dedup-window setting on your ClickHouse version.
 - **100K events/s sustained** through ingest+Kafka+processor: untested. Redis (3 ops per event) and a laptop Docker VM are likely bottlenecks; measure with `make load` and tune. Claim only what you measure.

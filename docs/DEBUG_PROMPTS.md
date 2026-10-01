@@ -1,6 +1,6 @@
-# Debugging with Claude Code (terse prompts, minimal tokens)
+# Debugging prompts (terse, minimal tokens)
 
-Start: `cd fleetnorm && claude` (CLAUDE.md is read automatically).
+Start: `cd fleetnorm` (AGENTS.md is the project guide).
 
 1. **Bring-up:** `Run "make up", then "make ps". For any unhealthy service read its logs and fix the root cause. Change the smallest thing. Stop when all are healthy.`
 2. **Seed + flow:** `Run "make seed" then "make sim" for 60 s. Query ClickHouse: SELECT count() FROM fleetnorm.telemetry. If 0, trace ingest -> kafka -> processor and fix.`

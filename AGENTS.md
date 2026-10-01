@@ -1,4 +1,4 @@
-# FleetNorm: project guide for Claude Code
+# FleetNorm: project guide for coding agents
 Node 20 ESM backend (ingest/processor/api/simulator share `backend/`), React+Vite frontend, Python ML service. Synthetic data only.
 
 ## Commands
@@ -15,3 +15,6 @@ Node 20 ESM backend (ingest/processor/api/simulator share `backend/`), React+Vit
 
 ## Known untested areas (debug first)
 Full docker stack end-to-end, ClickHouse DDL/insert settings + rollup MV, Kafka consumer path, Grafana queries, k6/chaos scripts, Terraform, Helm.
+
+## Git
+Sole author/owner: Adarsh Anand (adarshchotu09@gmail.com). Never mention any AI tool, model, or vendor name in commit messages, PR descriptions, or contributor metadata.

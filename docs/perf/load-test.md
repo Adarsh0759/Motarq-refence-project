@@ -53,7 +53,7 @@ Grafana) on one machine. The NFR target assumes horizontal scaling — more Redp
 `raw.telemetry` partitions, more processor/ingest replicas across real nodes — which this environment
 cannot demonstrate. `make load` / this script is the right tool to re-run against that topology once it
 exists; until then, **100K events/sec sustained is unverified, not false** (per the project's own
-TODO:MEASURE discipline, see `CLAUDE.md`).
+TODO:MEASURE discipline, see `AGENTS.md`).
 
 ### What would need to change to close the gap
 1. Redpanda: multiple brokers, `raw.telemetry` partitioned well beyond 12 (currently `-p 12 -r 1`), replication factor ≥2.

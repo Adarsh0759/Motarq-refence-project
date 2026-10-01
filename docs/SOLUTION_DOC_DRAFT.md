@@ -92,5 +92,5 @@ ADR-1..5 in `docs/adr/`. Risks, with evidence from today's measurement pass: Red
 ## 13. Demo video (≤ 5 min): script in README. Timestamps → fill into §4.
 ## 14. Repository checklist: README checklist; tag `v1.0-submission`.
 ## 15. Conclusion: TODO (3 sentences; lead with measured results).
-## 16. Declarations: AI tools (Claude), open-source list: README "Declarations".
+## 16. Declarations: AI tools, open-source list: README "Declarations".
 ## 17. Appendix: `docs/perf/explain-output.txt`, ADRs, ERD, STRIDE.
