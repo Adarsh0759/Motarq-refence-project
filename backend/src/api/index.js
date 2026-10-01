@@ -17,8 +17,17 @@ import { MappingInput } from '../shared/schema.js';
 import { normaliseAndValidate } from '../processor/normalise.js';
 import { clampInt, maskLocation, idleCost, ruleRisk, cursorOf } from './util.js';
 
-const pool = pgPool(10); const ch = clickhouse(); const r = redis(); const subR = redis({ enableReadyCheck: false });
+const pool = pgPool(30); const ch = clickhouse(); const r = redis(); const subR = redis({ enableReadyCheck: false });
 const mg = await mongo(); const db = mg.db(cfg.mongoDb);
+
+// KEYS blocks the single-threaded Redis server for the full keyspace scan (measured: 100% CPU pin
+// with a few million keys in the dataset); SCAN is cursor-based and non-blocking.
+const scanKeys = (pattern) => new Promise((resolve, reject) => {
+  const keys = []; const stream = r.scanStream({ match: pattern, count: 1000 });
+  stream.on('data', (ks) => keys.push(...ks));
+  stream.on('end', () => resolve(keys));
+  stream.on('error', reject);
+});
 
 const httpH = new client.Histogram({ name: 'api_request_seconds', help: 'API latency', labelNames: ['method', 'route', 'status'], buckets: [0.01, 0.025, 0.05, 0.1, 0.2, 0.5, 1, 2] });
 const app = express();
@@ -160,7 +169,7 @@ api.get('/insights/summary', wrap(async (req, res) => {
   const [openA, live, epsKeys, cost] = await Promise.all([
     pool.query(`SELECT count(*)::int c FROM alert a JOIN vehicle v USING (vehicle_id) WHERE v.fleet_id = ANY($1::int[]) AND a.status='open'`, [fleets]),
     Promise.all(fleets.map((f) => r.zcount(`live:${f}`, Date.now() - 120000, '+inf'))),
-    r.keys('stats:eps:*'),
+    scanKeys('stats:eps:*'),
     chq(`SELECT sum(idle_events) AS idle FROM hourly_vehicle_stats WHERE fleet_id IN {f:Array(UInt32)} AND hour >= now() - INTERVAL 7 DAY`, { f: fleets }),
   ]);
   const eps = epsKeys.length ? (await r.mget(epsKeys)).reduce((a, b) => a + Number(b || 0), 0) : 0;
@@ -233,11 +242,11 @@ api.post('/admin/oem-mappings/:oem/activate/:version', need('admin'), wrap(async
   res.json({ oem, version, active: true });
 }));
 api.get('/admin/dlq', need('admin'), wrap(async (_req, res) => {
-  const keys = await r.keys('dlq:count:*'); const vals = keys.length ? await r.mget(keys) : [];
+  const keys = await scanKeys('dlq:count:*'); const vals = keys.length ? await r.mget(keys) : [];
   const recent = await db.collection('dead_letter').find({}, { projection: { _id: 0 } }).sort({ at: -1 }).limit(10).toArray();
   res.json({ counts: Object.fromEntries(keys.map((k, i) => [k.replace('dlq:count:', ''), Number(vals[i])])), recent });
 }));
-api.delete('/admin/dlq', need('admin'), wrap(async (_req, res) => { const k = await r.keys('dlq:count:*'); if (k.length) await r.del(k); res.json({ cleared: k.length }); }));
+api.delete('/admin/dlq', need('admin'), wrap(async (_req, res) => { const k = await scanKeys('dlq:count:*'); if (k.length) await r.del(k); res.json({ cleared: k.length }); }));
 
 // ---------- compliance: right to erasure ----------
 api.delete('/admin/drivers/:id/erase', need('admin'), wrap(async (req, res) => {
